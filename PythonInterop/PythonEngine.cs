@@ -12,6 +12,29 @@ namespace PythonInterop
     {
         private static readonly Regex CheckIsPyVersion = new Regex("^Python (\\d+)\\.(\\d+)\\.(\\d+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
+        private static OSPlatform CurrentOsPlatform
+        {
+            get
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return OSPlatform.Linux;
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return OSPlatform.Windows;
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return OSPlatform.OSX;
+                }
+
+                throw new NotSupportedException();
+            }
+        }
+
         private static Process CreateAndExecuteProcess(string file, string args)
         {
             Process ps = new Process()
@@ -33,6 +56,8 @@ namespace PythonInterop
             return ps;
         }
 
+
+
         private static string GetPythonVersion(string path)
         {
             Process getVersionProcess = CreateAndExecuteProcess(path, "--version");
@@ -53,12 +78,14 @@ namespace PythonInterop
         {
             get
             {
-                var platformsActions = new Dictionary<PlatformID, (string, string)>()
+                var platformsActions = new Dictionary<OSPlatform, (string, string)>()
                 {
-                    {PlatformID.Win32NT, ("where", "python*.exe")}
+                    {OSPlatform.Windows, ("where", "python*.exe")},
+                    {OSPlatform.Linux, ("find", $"{Environment.GetEnvironmentVariable("PATH")?.Replace(':', ' ')} -perm +111 -iname python*")},
+                    {OSPlatform.OSX, ("where", "python*.exe")}
                 };
 
-                var (searcher, what) = platformsActions[Environment.OSVersion.Platform];
+                var (searcher, what) = platformsActions[CurrentOsPlatform];
 
                 string[] paths = CreateAndExecuteProcess(searcher, what).StandardOutput.ReadToEnd().Split(Environment.NewLine.ToCharArray());
 
