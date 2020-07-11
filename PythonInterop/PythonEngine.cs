@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace PythonInterop
 {
@@ -55,8 +56,6 @@ namespace PythonInterop
 
             return ps;
         }
-
-
 
         private static string GetPythonVersion(string path)
         {
@@ -127,6 +126,11 @@ namespace PythonInterop
             int exitCode = process.ExitCode;
 
             return new ExecutionResult(stdOut, stdErr, exitCode);
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(string pyFile, string[] args)
+        {
+            return new Task<ExecutionResult>(() => this.Execute(pyFile, args));
         }
     }
 }
