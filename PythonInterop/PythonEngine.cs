@@ -106,8 +106,13 @@ namespace PythonInterop
         public PythonEngine(PythonInterpreter interpreter)
             => this.Interpreter = interpreter;
 
+        public static bool DoesSystemHaveInterpreter => PythonEngine.PythonInterpreters.Any();
+
         public PythonEngine()
         {
+            if(!PythonEngine.DoesSystemHaveInterpreter)
+                throw new PythonEngineException("System has no Python interpreter");
+
             this.Interpreter = PythonEngine.PythonInterpreters.First();
         }
 
