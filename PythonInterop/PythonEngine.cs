@@ -81,8 +81,8 @@ namespace PythonInterop
                 var platformsActions = new Dictionary<OSPlatform, (string, string)>()
                 {
                     {OSPlatform.Windows, ("where", "python*.exe")},
-                    {OSPlatform.Linux, ("find", $"{Environment.GetEnvironmentVariable("PATH")?.Replace(':', ' ')} -perm +111 -iname python*")},
-                    {OSPlatform.OSX, ("where", "python*.exe")}
+                    {OSPlatform.Linux, ("find", $"{Environment.GetEnvironmentVariable("PATH")?.Replace(':', ' ')}  -executable -name python*")},
+                    {OSPlatform.OSX, ("find", $"{Environment.GetEnvironmentVariable("PATH")?.Replace(':', ' ')} -perm +111 -iname python*")}
                 };
 
                 var (searcher, what) = platformsActions[CurrentOsPlatform];
