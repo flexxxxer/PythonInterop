@@ -154,7 +154,7 @@ namespace PythonInterop
         /// <param name="scriptFile">script for execution</param>
         /// <param name="args">arguments for script</param>
         /// <returns>script <see cref="ExecutionResult"/></returns>
-        public ExecutionResult Execute(string scriptFile, string[] args)
+        public ExecutionResult Execute(string scriptFile, params string[] args)
         {
             string processArgs = $"{scriptFile} " + string.Join(" ", args);
 
@@ -173,7 +173,7 @@ namespace PythonInterop
         /// <param name="pyFile">script for execution</param>
         /// <param name="args">arguments for script</param>
         /// <returns>script <see cref="ExecutionResult"/></returns>
-        public Task<ExecutionResult> ExecuteAsync(string pyFile, string[] args)
+        public Task<ExecutionResult> ExecuteAsync(string pyFile, params string[] args)
         {
             return new Task<ExecutionResult>(() => this.Execute(pyFile, args));
         }
