@@ -9,10 +9,19 @@ using System.Threading.Tasks;
 
 namespace PythonInterop
 {
+    /// <summary>
+    /// Interop with Python
+    /// </summary>
     public class PythonEngine
     {
+        /// <summary>
+        /// This is a regular expression for checking if the Python version is consistent
+        /// </summary>
         private static readonly Regex CheckIsPyVersion = new Regex("^Python (\\d+)\\.(\\d+)\\.(\\d+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
+        /// <summary>
+        /// Current operating system
+        /// </summary>
         private static OSPlatform CurrentOsPlatform
         {
             get
@@ -36,6 +45,12 @@ namespace PythonInterop
             }
         }
 
+        /// <summary>
+        /// Creates and executes the process
+        /// </summary>
+        /// <param name="file">command or file to execute</param>
+        /// <param name="args">arguments to command or file</param>
+        /// <returns>completed process</returns>
         private static Process CreateAndExecuteProcess(string file, string args)
         {
             Process ps = new Process()
@@ -57,6 +72,11 @@ namespace PythonInterop
             return ps;
         }
 
+        /// <summary>
+        /// Getting interpreter version
+        /// </summary>
+        /// <param name="path">path to the interpreter</param>
+        /// <returns>version of the interpreter, or if it is not an interpreter, an empty string</returns>
         private static string GetPythonVersion(string path)
         {
             Process getVersionProcess = CreateAndExecuteProcess(path, "--version");
@@ -73,6 +93,9 @@ namespace PythonInterop
             return CheckIsPyVersion.Match(stdError).Success ? stdError.Substring(7) : string.Empty;
         }
 
+        /// <summary>
+        /// All system interpreters
+        /// </summary>
         public static IEnumerable<PythonInterpreter> PythonInterpreters
         {
             get
@@ -100,13 +123,23 @@ namespace PythonInterop
             }
         }
 
+        /// <summary>
+        /// Script interpreter
+        /// </summary>
         public PythonInterpreter Interpreter { get; }
 
         public PythonEngine(PythonInterpreter interpreter)
             => this.Interpreter = interpreter;
 
+        /// <summary>
+        /// Checks if there is at least one interpreter in the system
+        /// </summary>
         public static bool DoesSystemHaveInterpreter => PythonEngine.PythonInterpreters.Any();
 
+        /// <summary>
+        /// Create with first caught system interpreter
+        /// </summary>
+        /// <exception cref="PythonEngineException">Thrown when no one system interpreter found.</exception>
         public PythonEngine()
         {
             if(!PythonEngine.DoesSystemHaveInterpreter)
@@ -115,9 +148,15 @@ namespace PythonInterop
             this.Interpreter = PythonEngine.PythonInterpreters.First();
         }
 
-        public ExecutionResult Execute(string pyFile, string[] args)
+        /// <summary>
+        /// Execute specified file with args
+        /// </summary>
+        /// <param name="scriptFile">script for execution</param>
+        /// <param name="args">arguments for script</param>
+        /// <returns>script <see cref="ExecutionResult"/></returns>
+        public ExecutionResult Execute(string scriptFile, string[] args)
         {
-            string processArgs = $"{pyFile} " + string.Join(" ", args);
+            string processArgs = $"{scriptFile} " + string.Join(" ", args);
 
             var process = CreateAndExecuteProcess(this.Interpreter.Path, processArgs);
 
@@ -128,6 +167,12 @@ namespace PythonInterop
             return new ExecutionResult(stdOut, stdErr, exitCode);
         }
 
+        /// <summary>
+        /// Asynchronously execute specified file with args
+        /// </summary>
+        /// <param name="pyFile">script for execution</param>
+        /// <param name="args">arguments for script</param>
+        /// <returns>script <see cref="ExecutionResult"/></returns>
         public Task<ExecutionResult> ExecuteAsync(string pyFile, string[] args)
         {
             return new Task<ExecutionResult>(() => this.Execute(pyFile, args));
