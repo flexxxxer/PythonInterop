@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -158,13 +158,18 @@ namespace PythonInterop
         {
             string processArgs = $"{scriptFile} " + string.Join(" ", args);
 
-            var process = CreateAndExecuteProcess(this.Interpreter.Path, processArgs);
+            using (var process = CreateAndExecuteProcess(this.Interpreter.Path, processArgs))
+            {
+                var stdOutStream = new MemoryStream();
+                var stdErrorStream = new MemoryStream();
 
-            string stdOut = process.StandardOutput.ReadToEnd();
-            string stdErr = process.StandardError.ReadToEnd();
-            int exitCode = process.ExitCode;
+                process.StandardOutput.BaseStream.CopyTo(stdOutStream);
+                process.StandardError.BaseStream.CopyTo(stdErrorStream);
 
-            return new ExecutionResult(stdOut, stdErr, exitCode);
+                int exitCode = process.ExitCode;
+
+                return new ExecutionResult(stdOutStream, stdErrorStream, exitCode);
+            }
         }
 
         /// <summary>
