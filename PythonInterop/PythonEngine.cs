@@ -69,7 +69,13 @@ namespace PythonInterop
             };
 
             ps.Start();
-            ps.WaitForExit();
+
+            /* not all programmers write sys.exit() at the end of the python script,
+               so this line makes the wait infinite for most scripts.
+               if for some reason you need to wait for the end of execution,
+               you can uncomment this line */
+
+            // ps.WaitForExit();
 
             return ps;
         }
@@ -181,8 +187,6 @@ namespace PythonInterop
         /// <param name="args">arguments for script</param>
         /// <returns>script <see cref="ExecutionResult"/></returns>
         public Task<ExecutionResult> ExecuteAsync(string pyFile, params string[] args)
-        {
-            return new Task<ExecutionResult>(() => this.Execute(pyFile, args));
-        }
+            => Task.Run(() => this.Execute(pyFile, args));
     }
 }
