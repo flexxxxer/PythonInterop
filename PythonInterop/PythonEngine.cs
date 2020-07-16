@@ -164,7 +164,7 @@ namespace PythonInterop
         /// <returns>script <see cref="ExecutionResult"/></returns>
         public ExecutionResult Execute(string scriptFile, params string[] args)
         {
-            string processArgs = $"{scriptFile} " + string.Join(" ", args);
+            string processArgs = $"\"{scriptFile}\" " + string.Join(" ", args);
 
             using (var process = CreateAndExecuteProcess(this.Interpreter.Path, processArgs))
             {
