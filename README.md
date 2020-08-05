@@ -28,11 +28,15 @@ var interpreter = PythonEngine.PythonInterpreters
 #### Getting an interpreter related only to the second version (i.e. between 2.0.0 and 2.99.99)
 ```csharp
 var interpreter = PythonEngine.PythonInterpreters
-                  .First(i => 
-                      string.CompareOrdinal(i.Version, "3.0.0") < 0 && 
-                      string.CompareOrdinal(i.Version, "2.0.0") > 1);
+                  .First(i => string.CompareOrdinal(i.Version, "3.0.0") < 0 &&
+                              string.CompareOrdinal(i.Version, "2.0.0") > 1);
 ```
-
+#### Execute existing script with some interpreter
+```csharp
+PythonInterpreter enigEngine = PythonEngine.PythonInterpreters.First();
+PythonEngine engine = new PythonEngine(enigEngine);
+ExecutionResult result = engine.Execute("path-to-script.py", "argValue1", "argValue2", "argValueN");
+```
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
